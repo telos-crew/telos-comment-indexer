@@ -24,7 +24,6 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
       })
     }
     const { data } = await axios.get(`${DSTOR_IPFS_BASE_URL}/${content_hash}`)
-    console.log('data', data)
   } catch (err) {
     console.error(err)
   }

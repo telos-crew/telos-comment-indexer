@@ -48,14 +48,11 @@ export const query = async (contract: string, Database: any) => {
       after[contract].date
     )}&account=${contract}`
     const params = CONFIG[contract].params
-    console.log('url: ', url)
-    console.log('params', params)
     const { data }: { data: HyperionActionsResponse } = await axios.get(url, {
       params,
     })
     const { actions } = data
     actions.sort((a, b) => a.block_num - b.block_num)
-    // console.log(contract, 'actions', actions.length)
     actions.forEach((actions) => {
       if (after[contract].date < actions.timestamp) {
         after[contract].date = actions.timestamp
@@ -67,7 +64,6 @@ export const query = async (contract: string, Database: any) => {
     after[contract].iterator++
     for (const action of actions) {
       await CONFIG[contract].handler(action, Database)
-      // await updateBlockNum(actions, Database)
     }
   } catch (e) {
     console.log(e)
