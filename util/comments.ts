@@ -22,9 +22,35 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
         account_name: poster,
         created_at: timestamp,
       })
+      const data = await fetchHashFile(content_hash)
+      console.log('updateCommentAction data: ', data)
+      await Database.table('comments').insert({
+        ...data,
+        post_id,
+        level: 0,
+        poster,
+        content_hash,
+        transaction_id: action.trx_id,
+        block_num: action.block_num,
+      })
     }
-    const { data } = await axios.get(`${DSTOR_IPFS_BASE_URL}/${content_hash}`)
   } catch (err) {
-    console.error(err)
+    console.log(err)
   }
+}
+
+export const fetchHashFile = async (content_hash: string): Promise<object> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(reject, 60000)
+    const period = 2000
+    const attemptFetchFile = async () => {
+      try {
+        const { data } = await axios.get(`${DSTOR_IPFS_BASE_URL}/${content_hash}`)
+        return resolve(data)
+      } catch (err) {
+        setTimeout(attemptFetchFile, period)
+      }
+    }
+    attemptFetchFile()
+  })
 }
