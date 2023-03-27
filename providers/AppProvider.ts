@@ -11,7 +11,7 @@ export default class AppProvider {
   public async boot() {
     // IoC container is ready
     const { default: Database } = await import('@ioc:Adonis/Lucid/Database')
-    query('testcomments', Database)
+    setInterval(() => query('testcomments', Database), 1000)
   }
 
   public async ready() {
