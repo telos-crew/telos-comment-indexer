@@ -1,5 +1,7 @@
 import Env from '@ioc:Adonis/Core/Env'
 import axios from 'axios'
+import { HyperionActionsResponse } from 'types/blockchain'
+import { updateComment } from './comments'
 
 const ENDPOINT = Env.get('HYPERION_ENDPOINT')
 const COMMENT_SMART_CONTRACT = Env.get('COMMENT_SMART_CONTRACT')
@@ -14,7 +16,13 @@ const after = {
 console.log('starting from: ', after)
 
 const handleCommentAction = async (action, Database) => {
-  console.log(action)
+  switch (action.act.name) {
+    case 'post':
+      await updateComment(action, Database)
+      return
+    default:
+      return
+  }
 }
 
 const CONFIG = {
@@ -42,7 +50,7 @@ export const query = async (contract: string, Database: any) => {
     const params = CONFIG[contract].params
     console.log('url: ', url)
     console.log('params', params)
-    const { data } = await axios.get(url, {
+    const { data }: { data: HyperionActionsResponse } = await axios.get(url, {
       params,
     })
     const { actions } = data
