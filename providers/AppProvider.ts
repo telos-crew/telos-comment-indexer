@@ -1,4 +1,5 @@
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import { query } from '../util/hyperion'
 
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
@@ -9,6 +10,8 @@ export default class AppProvider {
 
   public async boot() {
     // IoC container is ready
+    const { default: Database } = await import('@ioc:Adonis/Lucid/Database')
+    query('testcomments', Database)
   }
 
   public async ready() {
