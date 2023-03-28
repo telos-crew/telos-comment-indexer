@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('post_id').notNullable()
       table.string('parent_id')
-      table.integer('level')
+      table.integer('level').notNullable()
       table.string('contract').notNullable()
       table.string('scope').notNullable()
       table.string('table').notNullable()

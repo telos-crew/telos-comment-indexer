@@ -29,6 +29,25 @@ export default class CommentsController {
     }
   }
 
+  public async getItemComments({ request, response }: HttpContextContract) {
+    try {
+      const { contract, scope, table, primary_key, parent_id = null } = request.qs()
+      if (!contract || !scope || !table || !primary_key) {
+        return response.status(400).json({ error: 'Missing required params' })
+      }
+      const comments = await Database.from('comments').where({
+        contract,
+        scope,
+        table,
+        primary_key,
+        parent_id,
+      })
+      return response.json(comments)
+    } catch (err) {
+      return response.status(500).json({ error: err })
+    }
+  }
+
   public async create({}: HttpContextContract) {}
 
   public async store({}: HttpContextContract) {}
