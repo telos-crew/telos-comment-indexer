@@ -17,6 +17,7 @@ export default class extends BaseSchema {
       table.string('poster').notNullable()
       table.text('content', 'longtext')
       table.string('content_hash').notNullable()
+      table.integer('children').defaultTo(0)
       table.string('transaction_id').notNullable()
       table.string('block_num').notNullable()
       table.boolean('is_deleted').defaultTo(false)

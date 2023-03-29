@@ -7,7 +7,7 @@ const DSTOR_IPFS_BASE_URL = Env.get('DSTOR_IPFS_BASE_URL')
 export const updateCommentAction = async (action: HyperionAction, Database: any) => {
   const {
     act: {
-      data: { poster, post_id, content_hash },
+      data: { poster, post_id, content_hash, parent_id },
     },
     timestamp,
   } = action
@@ -24,15 +24,27 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
       })
       const data = await fetchHashFile(content_hash)
       console.log('updateCommentAction data: ', data)
+      let level = 0
+      if (data.parent_id) {
+        const [parentComment] = await Database.from('comments')
+          .select('*')
+          .where('post_id', data.parent_id)
+        if (parentComment) {
+          level = parentComment.level + 1
+        }
+      }
       await Database.table('comments').insert({
         ...data,
         post_id,
-        level: 0,
+        level,
         poster,
         content_hash,
         transaction_id: action.trx_id,
         block_num: action.block_num,
       })
+      if (data.parent_id) {
+        await Database.from('comments').where('post_id', data.parent_id).increment('children', 1)
+      }
     }
   } catch (err) {
     console.log(err)
