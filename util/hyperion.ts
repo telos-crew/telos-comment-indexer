@@ -8,7 +8,7 @@ const COMMENT_SMART_CONTRACT = Env.get('COMMENT_SMART_CONTRACT')
 
 const after = {
   [COMMENT_SMART_CONTRACT]: {
-    date: '2023-03-27T20:00:00.000',
+    date: '2023-03-30T16:00:00.000',
     iterator: 1,
   },
 }

@@ -12,6 +12,7 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
     timestamp,
   } = action
   try {
+    console.log('action: ', action)
     const [existingComment] = await Database.from('comment_actions')
       .select('*')
       .where('post_id', post_id)
@@ -41,6 +42,7 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
         content_hash,
         transaction_id: action.trx_id,
         block_num: action.block_num,
+        created_at: timestamp,
       })
       if (data.parent_id) {
         await Database.from('comments').where('post_id', data.parent_id).increment('children', 1)

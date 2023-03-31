@@ -35,6 +35,7 @@ export default class CommentsController {
       if (!contract || !scope || !table || !primary_key) {
         return response.status(400).json({ error: 'Missing required params' })
       }
+      console.log('parent_id: ', parent_id)
       const comments = await Database.from('comments').where({
         contract,
         scope,
