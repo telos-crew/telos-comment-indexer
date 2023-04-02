@@ -7,7 +7,7 @@ const DSTOR_IPFS_BASE_URL = Env.get('DSTOR_IPFS_BASE_URL')
 export const updateCommentAction = async (action: HyperionAction, Database: any) => {
   const {
     act: {
-      data: { poster, post_id, content_hash, parent_id },
+      data: { poster, content_hash },
     },
     timestamp,
   } = action
@@ -15,10 +15,9 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
     console.log('action: ', action)
     const [existingComment] = await Database.from('comment_actions')
       .select('*')
-      .where('post_id', post_id)
+      .where('content_hash', content_hash)
     if (!existingComment) {
       await Database.table('comment_actions').insert({
-        post_id,
         content_hash,
         account_name: poster,
         created_at: timestamp,
@@ -26,17 +25,16 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
       const data = await fetchHashFile(content_hash)
       console.log('updateCommentAction data: ', data)
       let level = 0
-      if (data.parent_id) {
+      if (data.parent_hash) {
         const [parentComment] = await Database.from('comments')
           .select('*')
-          .where('post_id', data.parent_id)
+          .where('content_hash', data.parent_hash)
         if (parentComment) {
           level = parentComment.level + 1
         }
       }
       await Database.table('comments').insert({
         ...data,
-        post_id,
         level,
         poster,
         content_hash,
@@ -44,8 +42,10 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
         block_num: action.block_num,
         created_at: timestamp,
       })
-      if (data.parent_id) {
-        await Database.from('comments').where('post_id', data.parent_id).increment('children', 1)
+      if (data.parent_hash) {
+        await Database.from('comments')
+          .where('content_hash', data.parent_hash)
+          .increment('children', 1)
       }
     }
   } catch (err) {

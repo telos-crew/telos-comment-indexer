@@ -1,6 +1,5 @@
 export type PostAction = {
   poster: string
-  post_id: string
   content_hash: string
 }
 
