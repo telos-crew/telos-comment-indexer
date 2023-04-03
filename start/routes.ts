@@ -26,3 +26,5 @@ Route.get('/', async () => {
 
 Route.get('/comment/:content_hash', 'CommentsController.getCommentByHash')
 Route.get('/item/comments', 'CommentsController.getItemComments')
+
+Route.post('/upload', 'UploadsController.upload')
