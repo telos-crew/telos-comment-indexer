@@ -12,6 +12,8 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
     timestamp,
   } = action
   try {
+    // hyperion issue
+    if (!poster || !content_hash) return
     const [existingComment] = await Database.from('comment_actions')
       .select('*')
       .where('content_hash', content_hash)

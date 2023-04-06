@@ -45,5 +45,6 @@ export default class CommentsController {
     const hash: string = await fetchDstorUploadStatus(accessToken, uploadToken)
     console.log('hash: ', hash)
     await Redis.set(`upload-timeout-${ip}`, redisValue ? +redisValue + 1 : 1, 'ex', 60 * 10)
+    return response.status(200).send({ hash })
   }
 }
