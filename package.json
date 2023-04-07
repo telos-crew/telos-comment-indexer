@@ -10,7 +10,11 @@
     "start": "node server.js",
     "test": "node ace test",
     "lint": "eslint . --ext=.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "dockerAttach": "docker exec -it adonis_app /bin/sh",
+    "dockerAttachRedis": "docker exec -it redis /bin/sh",
+    "dockerAttachPostgres": "docker exec -it postgres /bin/sh",
+    "migrate:force": "ace migration:run --force"
   },
   "eslintConfig": {
     "extends": [
@@ -59,8 +63,10 @@
   "dependencies": {
     "@adonisjs/core": "^5.8.0",
     "@adonisjs/lucid": "^18.3.0",
+    "@adonisjs/redis": "^7.3.2",
     "@adonisjs/repl": "^3.1.0",
     "axios": "^1.3.4",
+    "form-data": "^4.0.0",
     "luxon": "^3.3.0",
     "pg": "^8.10.0",
     "proxy-addr": "^2.0.7",

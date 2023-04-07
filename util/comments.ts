@@ -12,7 +12,8 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
     timestamp,
   } = action
   try {
-    console.log('action: ', action)
+    // hyperion issue
+    if (!poster || !content_hash) return
     const [existingComment] = await Database.from('comment_actions')
       .select('*')
       .where('content_hash', content_hash)
@@ -23,7 +24,6 @@ export const updateCommentAction = async (action: HyperionAction, Database: any)
         created_at: timestamp,
       })
       const data = await fetchHashFile(content_hash)
-      console.log('updateCommentAction data: ', data)
       let level = 0
       if (data.parent_hash) {
         const [parentComment] = await Database.from('comments')
