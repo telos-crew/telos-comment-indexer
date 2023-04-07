@@ -1,0 +1,48 @@
+ARG NODE_IMAGE=node:16.17.0
+
+FROM $NODE_IMAGE AS base
+
+# Set working directory
+WORKDIR /usr/src/app
+
+
+ENV PORT=3838
+ENV HOST=0.0.0.0
+ENV NODE_ENV=development
+ENV APP_KEY=nofallomuitoportugues
+ENV DRIVE_DISK=local
+ENV APP_NAME="Telos Comment"
+ENV HYPERION_ENDPOINT=https://testnet.telos.caleos.io
+ENV COMMENT_SMART_CONTRACT=testcomments
+ENV DB_CONNECTION=pg
+ENV PG_HOST=localhost
+ENV PG_PORT=5432
+ENV PG_USER=comment
+ENV PG_PASSWORD='S4pient!postgres'
+ENV PG_DB_NAME=comment
+ENV REDIS_CONNECTION=local
+ENV REDIS_HOST=127.0.0.1
+ENV REDIS_PORT=6379
+ENV REDIS_PASSWORD=
+ENV DSTOR_IPFS_BASE_URL=https://api.dstor.cloud/ipfs
+ENV DSTOR_API_KEY=OlRxGyBCDJH351kgliCReO5rwU7xnXweorlA7b5DzpWiVztu7nW8QWKJJHeVt55G
+ENV UPLOAD_BYTES_LIMIT=30000
+
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci --production
+
+# Copy app source code
+COPY . .
+
+# Build app
+RUN npm run build --production --ignore-ts-errors
+
+COPY ./.env ./build
+
+# Expose port
+EXPOSE 3838
+
+# Start app
+CMD ["node", "./build/server.js"]
