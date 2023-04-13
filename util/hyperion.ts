@@ -41,9 +41,9 @@ let isProcessing = {
 }
 
 export const query = async (contract: string, Database: any) => {
+  isProcessing[contract] = true
   try {
     if (isProcessing[contract] === true) return
-    isProcessing[contract] === true
     const url = `${ENDPOINT}/v2/history/get_actions?after=${encodeURIComponent(
       after[contract].date
     )}&account=${contract}`
