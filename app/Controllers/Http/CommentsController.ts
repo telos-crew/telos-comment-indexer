@@ -1,7 +1,22 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Redis from '@ioc:Adonis/Addons/Redis'
+import { AuthServer } from '../../../util/auth'
 
 export default class CommentsController {
+  public async saveItemComment({ request, response }: HttpContextContract) {
+    const { account_name, payload, transaction } = request.body()
+    const nonce = await Redis.get(`nonce:${account_name}`)
+    if (!nonce) return response.status(500).json({ error: 'Server error' })
+    const authServer = new AuthServer()
+    const isValidNonce = await authServer.verifyNonce({
+      account_name,
+      proof: transaction,
+      nonce,
+    })
+    console.log('isValidNonce: ', isValidNonce)
+  }
+
   public async getCommentByHash({ request, response }: HttpContextContract) {
     try {
       console.log('getCommentByHash')

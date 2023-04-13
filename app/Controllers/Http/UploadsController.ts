@@ -8,7 +8,7 @@ import { fetchDstorUploadStatus, fetchDstorUploadToken, uploadFileToDstor } from
 import FormData from 'form-data'
 import Application from '@ioc:Adonis/Core/Application'
 
-export default class CommentsController {
+export default class UploadsController {
   public async upload({ request, response }: HttpContextContract) {
     let body: CommentUploadPayload
     try {
