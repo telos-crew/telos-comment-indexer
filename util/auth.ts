@@ -48,19 +48,21 @@ export class AuthServer {
 
   public async verifyNonce({
     account_name,
-    proof,
+    serializedTransaction,
+    signatures,
     nonce,
   }: NonceVerificationParams): Promise<boolean> {
-    if (!proof || !proof.signatures.length || !proof.serializedTransaction) {
+    if (!signatures.length || !serializedTransaction) {
       throw new InvalidProofError()
     }
     // make buffer from transaction
-    const arr = []
-    for (const key in proof.serializedTransaction) {
-      arr.push(proof.serializedTransaction[key])
-    }
-    const uarr = new Uint8Array(arr)
-    const buf = Buffer.from(uarr)
+    const st = new Uint8Array(
+      atob(serializedTransaction)
+        .split('')
+        .map((char) => char.charCodeAt(0))
+    )
+
+    const buf = Buffer.from(st)
 
     const data = Buffer.concat([
       Buffer.from(this.chainId, 'hex'),
@@ -69,7 +71,7 @@ export class AuthServer {
     ])
 
     const recoveredKeys: string[] = []
-    proof.signatures.forEach((sigstr: string) => {
+    signatures.forEach((sigstr: string) => {
       const sig = Signature.fromString(sigstr)
       recoveredKeys.push(PublicKey.fromString(sig.recover(data).toString()).toLegacyString())
     })
@@ -90,14 +92,17 @@ export class AuthServer {
       if (!match) {
         return false
       }
-
-      const actions = await this.api.deserializeActions(
-        this.api.deserializeTransaction(uarr).actions
-      )
-      const action = actions.find((a) => a.name === 'requestrand')
+      console.log('st: ', st)
+      const deserializedTx = this.api.deserializeTransaction(st)
+      console.log('deserializedTx: ', deserializedTx)
+      const actions = await this.api.deserializeActions(deserializedTx.actions)
+      console.log('actions: ', actions)
+      const action = actions.find((a) => a.name === 'post')
+      console.log('action: ', !!action)
       if (!action) return false
-      const transactionNonce = action.data.assoc_id
-
+      const { nonce: transactionNonce } = JSON.parse(action.data.content_hash)
+      console.log('transactionNonce', transactionNonce)
+      // console.log(nonce)
       if (nonce !== transactionNonce) {
         return false
       }
