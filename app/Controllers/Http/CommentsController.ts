@@ -5,13 +5,16 @@ import { AuthServer } from '../../../util/auth'
 
 export default class CommentsController {
   public async saveItemComment({ request, response }: HttpContextContract) {
-    const { account_name, payload, transaction } = request.body()
+    console.log(request.body())
+    const { account_name, payload, serializedTransaction, signatures } = request.body().data
     const nonce = await Redis.get(`nonce:${account_name}`)
+    console.log(nonce)
     if (!nonce) return response.status(500).json({ error: 'Server error' })
     const authServer = new AuthServer()
     const isValidNonce = await authServer.verifyNonce({
       account_name,
-      proof: transaction,
+      serializedTransaction,
+      signatures,
       nonce,
     })
     console.log('isValidNonce: ', isValidNonce)
