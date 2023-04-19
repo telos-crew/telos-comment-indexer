@@ -13,7 +13,7 @@ export default class AppProvider {
     // IoC container is ready
     // const { default: Database } = await import('@ioc:Adonis/Lucid/Database')
     // setInterval(() => query('testcomments', Database), 1000)
-    replenishDstorAccessToken()
+    // replenishDstorAccessToken()
   }
 
   public async ready() {
