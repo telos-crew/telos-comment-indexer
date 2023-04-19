@@ -32,3 +32,4 @@ Route.post('/upload', 'UploadsController.upload')
 Route.post('/upload/media', 'UploadsController.uploadMedia')
 
 Route.get('/auth/nonce', 'AuthController.getNonce')
+Route.post('/auth/nonce', 'AuthController.validateNonce')

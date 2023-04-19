@@ -42,8 +42,11 @@ export class AuthServer {
   }
 
   public generateNonce(): string {
-    const nonce = blake2b(randomBytes(32), undefined, 32)
-    return getInt64StrFromUint8Array(nonce)
+    const nonceArray = blake2b(randomBytes(32), undefined, 32)
+    const nonce = getInt64StrFromUint8Array(nonceArray)
+    const timestamp = Math.floor(new Date().getTime()) / 1000 + 60 * 60 * 24 * 30
+    const combinedSyntax = `${nonce}:${timestamp}`
+    return combinedSyntax
   }
 
   public async verifyNonce({
