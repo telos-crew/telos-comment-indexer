@@ -3,20 +3,34 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Redis from '@ioc:Adonis/Addons/Redis'
 import { AuthServer } from '../../../util/auth'
 
+type SaveItemCommentBody = {
+  contract: string
+  table: string
+  scope: string
+  primary_key: string
+  key_type: any
+}
+
 export default class CommentsController {
   public async saveItemComment({ request, response }: HttpContextContract) {
     console.log(request.body())
-    const { account_name, payload, serializedTransaction, signatures } = request.body().data
+    const { account_name, payload } = request.body().data
     const nonce = await Redis.get(`nonce:${account_name}`)
     console.log(nonce)
     if (!nonce) return response.status(500).json({ error: 'Server error' })
     const authServer = new AuthServer()
-    const isValidNonce = await authServer.verifyNonce({
-      account_name,
-      serializedTransaction,
-      signatures,
-      nonce,
+    console.log('saveItemComment about to verifyNonce')
+    await Database.table('comments').insert({
+      ...payload,
+      poster: account_name,
     })
+    // const isValidNonce = await authServer.verifyNonce({
+    //   account_name,
+    //   serializedTransaction,
+    //   signatures,
+    //   nonce,
+    // })
+
     console.log('isValidNonce: ', isValidNonce)
   }
 
