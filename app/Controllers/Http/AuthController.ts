@@ -13,6 +13,7 @@ export default class AuthController {
 
   public async validateNonce({ request, response }: HttpContextContract) {
     const { account_name, serializedTransaction, signatures } = request.body()
+    console.log('validateNonce request.body()', request.body())
     const nonce = await Redis.get(`nonce:${account_name}`)
     try {
       const authServer = new AuthServer()
