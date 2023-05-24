@@ -31,7 +31,8 @@
       "@japa/preset-adonis/build/adonis-typings",
       "@adonisjs/lucid",
       "@adonisjs/redis",
-      "@adonisjs/auth"
+      "@adonisjs/auth",
+      "@adonisjs/session"
     ]
   }
 }

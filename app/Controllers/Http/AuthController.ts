@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import { AuthServer } from '../../../util/auth'
 import Redis from '@ioc:Adonis/Addons/Redis'
 
@@ -6,14 +7,20 @@ export default class AuthController {
   public async getNonce({ request, response }: HttpContextContract) {
     const { account_name } = request.qs()
     const authServer = new AuthServer()
-    const nonceAndExpiration = await authServer.generateNonce()
-    await Redis.set(`nonce:${account_name}`, nonceAndExpiration, 'ex', 60 * 60 * 24 * 30)
-    return response.json({ nonce: nonceAndExpiration })
+    const nonce = await authServer.generateNonce()
+    await Redis.set(`nonce:${account_name}`, nonce, 'ex', 120)
+    const [user] = await Database.from('users').where({ account_name })
+    console.log('user', user)
+    if (!user) {
+      await Database.table('users').insert({ account_name })
+    }
+    return response.json({ nonce })
   }
 
-  public async validateNonce({ request, response }: HttpContextContract) {
+  public async validateNonce({ auth, request, response }: HttpContextContract) {
     const { account_name, serializedTransaction, signatures } = request.body()
     console.log('validateNonce request.body()', request.body())
+    const user = await Database.from('users').where({ account_name }).firstOrFail()
     const nonce = await Redis.get(`nonce:${account_name}`)
     try {
       const authServer = new AuthServer()
@@ -23,8 +30,10 @@ export default class AuthController {
         signatures,
         nonce,
       })
+      console.log('isValid', isValid)
       if (!isValid) return response.status(400).json({ error: 'Invalid nonce' })
-      return response.status(204)
+      console.log('about to login with user', user)
+      await auth.use('web').loginViaId(user.id, true)
     } catch (err) {
       return response.status(400).json({ error: err.message })
     }
