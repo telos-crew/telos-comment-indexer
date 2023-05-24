@@ -33,7 +33,7 @@ export default class AuthController {
       console.log('isValid', isValid)
       if (!isValid) return response.status(400).json({ error: 'Invalid nonce' })
       console.log('about to login with user', user)
-      await auth.use('web').loginViaId(user.id, true)
+      await auth.use('web').login(user, true)
     } catch (err) {
       return response.status(400).json({ error: err.message })
     }
