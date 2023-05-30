@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import User from 'App/Models/User'
 import { AuthServer } from '../../../util/auth'
 import Redis from '@ioc:Adonis/Addons/Redis'
 
@@ -20,7 +21,7 @@ export default class AuthController {
   public async validateNonce({ auth, request, response }: HttpContextContract) {
     const { account_name, serializedTransaction, signatures } = request.body()
     console.log('validateNonce request.body()', request.body())
-    const user = await Database.from('users').where({ account_name }).firstOrFail()
+    const user = await User.query().where('account_name', account_name).firstOrFail()
     const nonce = await Redis.get(`nonce:${account_name}`)
     try {
       const authServer = new AuthServer()
@@ -31,6 +32,7 @@ export default class AuthController {
         nonce,
       })
       console.log('isValid', isValid)
+      console.log('auth: ', auth)
       if (!isValid) return response.status(400).json({ error: 'Invalid nonce' })
       console.log('about to login with user', user)
       await auth.use('web').login(user, true)
