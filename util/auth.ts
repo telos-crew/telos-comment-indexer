@@ -56,12 +56,12 @@ export class AuthServer {
     nonce,
   }: NonceVerificationParams): Promise<boolean> {
     if (!nonce) return false
-    console.log('verifyNonce signatures', signatures)
+    // console.log('verifyNonce signatures', signatures)
     if (!signatures.length || !serializedTransaction) {
       throw new InvalidProofError()
     }
     // make buffer from transaction
-    console.log('making buffer')
+    // console.log('making buffer')
     const st = new Uint8Array(
       atob(serializedTransaction)
         .split('')
@@ -98,22 +98,22 @@ export class AuthServer {
       if (!match) {
         return false
       }
-      console.log('st: ', st)
+      // console.log('st: ', st)
       const deserializedTx = this.api.deserializeTransaction(st)
-      console.log('deserializedTx: ', deserializedTx)
+      // console.log('deserializedTx: ', deserializedTx)
       const actions = await this.api.deserializeActions(deserializedTx.actions)
-      console.log('actions: ', actions)
+      // console.log('actions: ', actions)
       const action = actions.find((a) => a.name === 'auth')
-      console.log('action: ', !!action)
+      // console.log('action: ', !!action)
       if (!action) return false
-      console.log('about to parse action.data.nonce', action.data.nonce)
+      // console.log('about to parse action.data.nonce', action.data.nonce)
       const { nonce: transactionNonce } = action.data
-      console.log('transactionNonce', transactionNonce)
-      console.log('nonce', nonce)
+      // console.log('transactionNonce', transactionNonce)
+      // console.log('nonce', nonce)
       if (nonce.split(':')[0] !== transactionNonce) {
         return false
       }
-      console.log('nonce true')
+      // console.log('nonce true')
       return true
     } else return false
   }
