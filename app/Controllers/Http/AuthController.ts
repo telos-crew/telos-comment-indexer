@@ -20,10 +20,10 @@ export default class AuthController {
 
   public async validateNonce({ auth, request, response }: HttpContextContract) {
     const { account_name, serializedTransaction, signatures } = request.body()
-    console.log('validateNonce request.body()', request.body())
     const [user] = await Database.query().from('users').where('account_name', account_name)
     const nonce = await Redis.get(`nonce:${account_name}`)
     try {
+      // start custom validation
       const authServer = new AuthServer()
       const isValid = await authServer.verifyNonce({
         account_name,
@@ -31,14 +31,10 @@ export default class AuthController {
         signatures,
         nonce,
       })
-      console.log('isValid', isValid)
-      // console.log('auth: ', auth)
       if (!isValid) return response.status(400).json({ error: 'Invalid nonce' })
-      console.log('about to login with user', user)
-      const isAuth = await auth.use('web').loginViaId(user.id, true)
-      console.log('isAuth', isAuth)
+      // end custom validation
+      await auth.use('web').loginViaId(user.id, true)
     } catch (err) {
-      console.log('validateNonce error: ', err)
       return response.status(400).json({ error: err.message })
     }
   }

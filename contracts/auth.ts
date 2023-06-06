@@ -33,7 +33,7 @@ declare module '@ioc:Adonis/Addons/Auth' {
     | different Lucid models.
     |
     */
-    providerName: {
+    user: {
       implementation: DatabaseProviderContract<DatabaseProviderRow>
       config: DatabaseProviderConfig
     }
