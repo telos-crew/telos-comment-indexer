@@ -14,24 +14,19 @@ type SaveItemCommentBody = {
 export default class CommentsController {
   public async saveItemComment({ request, response }: HttpContextContract) {
     console.log(request.body())
-    const { account_name, payload } = request.body().data
-    const nonce = await Redis.get(`nonce:${account_name}`)
-    console.log(nonce)
-    if (!nonce) return response.status(500).json({ error: 'Server error' })
-    const authServer = new AuthServer()
+    const payload = request.body().data
+    // const nonce = await Redis.get(`nonce:${account_name}`)
+    // console.log(nonce)
+    // if (!nonce) return response.status(500).json({ error: 'Server error' })
+    // const authServer = new AuthServer()
     console.log('saveItemComment about to verifyNonce')
-    await Database.table('comments').insert({
-      ...payload,
-      poster: account_name,
-    })
+    await Database.table('comments').insert(payload)
     // const isValidNonce = await authServer.verifyNonce({
     //   account_name,
     //   serializedTransaction,
     //   signatures,
     //   nonce,
     // })
-
-    console.log('isValidNonce: ', isValidNonce)
   }
 
   public async getCommentByHash({ request, response }: HttpContextContract) {
