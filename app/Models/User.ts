@@ -6,7 +6,10 @@ export default class User extends BaseModel {
   public id: number
 
   @column()
-  public account_name: string
+  public rememberMeToken: string
+
+  @column()
+  public accountName: string
 
   // @column.dateTime({ autoCreate: true })
   // public createdAt: DateTime
