@@ -1,7 +1,54 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Redis from '@ioc:Adonis/Addons/Redis'
+import { AuthServer } from '../../../util/auth'
+
+type SaveItemCommentBody = {
+  contract: string
+  table: string
+  scope: string
+  primary_key: string
+  key_type: any
+}
 
 export default class CommentsController {
+  public async saveItemComment({ request, response }: HttpContextContract) {
+    console.log(request.body())
+    const payload = request.body().data
+    // const nonce = await Redis.get(`nonce:${account_name}`)
+    // console.log(nonce)
+    // if (!nonce) return response.status(500).json({ error: 'Server error' })
+    // const authServer = new AuthServer()
+    console.log('saveItemComment about to verifyNonce')
+    await Database.table('comments').insert(payload)
+    // const isValidNonce = await authServer.verifyNonce({
+    //   account_name,
+    //   serializedTransaction,
+    //   signatures,
+    //   nonce,
+    // })
+  }
+
+  public async getItemComments({ request, response }: HttpContextContract) {
+    try {
+      const { contract, scope, table, primary_key, parent_id = null } = request.qs()
+      if (!contract || !scope || !table || !primary_key) {
+        return response.status(400).json({ error: 'Missing required params' })
+      }
+      console.log('parent_id: ', parent_id)
+      const comments = await Database.from('comments').where({
+        contract,
+        scope,
+        table,
+        primary_key,
+        parent_id,
+      })
+      return response.json(comments)
+    } catch (err) {
+      return response.status(500).json({ error: err })
+    }
+  }
+
   public async getCommentByHash({ request, response }: HttpContextContract) {
     try {
       console.log('getCommentByHash')
@@ -24,26 +71,6 @@ export default class CommentsController {
         attemptGetFile()
       })
       return response.json(comment)
-    } catch (err) {
-      return response.status(500).json({ error: err })
-    }
-  }
-
-  public async getItemComments({ request, response }: HttpContextContract) {
-    try {
-      const { contract, scope, table, primary_key, parent_hash = null } = request.qs()
-      if (!contract || !scope || !table || !primary_key) {
-        return response.status(400).json({ error: 'Missing required params' })
-      }
-      console.log('parent_hash: ', parent_hash)
-      const comments = await Database.from('comments').where({
-        contract,
-        scope,
-        table,
-        primary_key,
-        parent_hash,
-      })
-      return response.json(comments)
     } catch (err) {
       return response.status(500).json({ error: err })
     }

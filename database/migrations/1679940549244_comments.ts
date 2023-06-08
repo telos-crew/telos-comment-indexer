@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('parent_hash')
+      // table.string('parent_hash')
       table.integer('level').notNullable()
       table.string('contract').notNullable()
       table.string('scope').notNullable()
@@ -15,10 +15,8 @@ export default class extends BaseSchema {
       table.string('key_type')
       table.string('poster').notNullable()
       table.text('content', 'longtext')
-      table.string('content_hash').notNullable()
+      // table.string('content_hash').notNullable()
       table.integer('children').defaultTo(0)
-      table.string('transaction_id').notNullable()
-      table.string('block_num').notNullable()
       table.boolean('is_deleted').defaultTo(false)
 
       /**
