@@ -29,6 +29,26 @@ export default class CommentsController {
     // })
   }
 
+  public async getItemComments({ request, response }: HttpContextContract) {
+    try {
+      const { contract, scope, table, primary_key, parent_id = null } = request.qs()
+      if (!contract || !scope || !table || !primary_key) {
+        return response.status(400).json({ error: 'Missing required params' })
+      }
+      console.log('parent_id: ', parent_id)
+      const comments = await Database.from('comments').where({
+        contract,
+        scope,
+        table,
+        primary_key,
+        parent_id,
+      })
+      return response.json(comments)
+    } catch (err) {
+      return response.status(500).json({ error: err })
+    }
+  }
+
   public async getCommentByHash({ request, response }: HttpContextContract) {
     try {
       console.log('getCommentByHash')
@@ -51,26 +71,6 @@ export default class CommentsController {
         attemptGetFile()
       })
       return response.json(comment)
-    } catch (err) {
-      return response.status(500).json({ error: err })
-    }
-  }
-
-  public async getItemComments({ request, response }: HttpContextContract) {
-    try {
-      const { contract, scope, table, primary_key, parent_hash = null } = request.qs()
-      if (!contract || !scope || !table || !primary_key) {
-        return response.status(400).json({ error: 'Missing required params' })
-      }
-      console.log('parent_hash: ', parent_hash)
-      const comments = await Database.from('comments').where({
-        contract,
-        scope,
-        table,
-        primary_key,
-        parent_hash,
-      })
-      return response.json(comments)
     } catch (err) {
       return response.status(500).json({ error: err })
     }

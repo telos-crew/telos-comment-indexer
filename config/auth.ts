@@ -32,12 +32,13 @@ const authConfig: AuthConfig = {
     web: {
       driver: 'session',
       provider: {
-        driver: 'database',
+        driver: 'lucid',
         identifierKey: 'id',
         usersTable: 'users',
         connection: 'pg',
         hashDriver: 'argon',
-        uids: ['id', 'account_name'],
+        uids: ['id'],
+        model: () => import('App/Models/User'),
       },
     },
   },
