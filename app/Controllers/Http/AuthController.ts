@@ -18,10 +18,10 @@ export default class AuthController {
     return response.json({ nonce })
   }
 
-  public async validateNonce({ auth, request, response }: HttpContextContract) {
+  public async validateNonce({ auth, request, response, session }: HttpContextContract) {
     const { account_name, serializedTransaction, signatures } = request.body()
     const user = await User.query().where({ account_name }).firstOrFail()
-    const nonce = await Redis.get(`nonce:${account_name}`)
+    // const nonce = await Redis.get(`nonce:${account_name}`)
     try {
       // start custom validation
       // const authServer = new AuthServer()
@@ -33,10 +33,19 @@ export default class AuthController {
       // })
       // if (!isValid) return response.status(400).json({ error: 'Invalid nonce' })
       // end custom validation
-      await auth.use('web').login(user, true)
+      const loginValue = await auth.use('web').login(user, true)
+      console.log('loginValue: ', loginValue)
+      return response.json({ rememberMeToken: loginValue['$attributes'].rememberMeToken })
     } catch (err) {
       return response.status(400).json({ error: err.message })
     }
+  }
+
+  public async test({ auth, request, response, session }: HttpContextContract) {
+    console.log('auth', auth)
+    console.log('session', session)
+    const cookie = request.cookie('adonis-session')
+    console.log('cookie', cookie)
   }
 
   public async create({}: HttpContextContract) {}

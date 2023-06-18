@@ -34,7 +34,6 @@ const authConfig: AuthConfig = {
       provider: {
         driver: 'lucid',
         identifierKey: 'id',
-        usersTable: 'users',
         connection: 'pg',
         hashDriver: 'argon',
         uids: ['id'],

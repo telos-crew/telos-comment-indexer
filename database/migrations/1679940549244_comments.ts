@@ -14,6 +14,7 @@ export default class extends BaseSchema {
       table.string('primary_key')
       table.string('key_type')
       table.string('poster').notNullable()
+      table.integer('parent_id').defaultTo(null)
       table.text('content', 'longtext')
       // table.string('content_hash').notNullable()
       table.integer('children').defaultTo(0)
