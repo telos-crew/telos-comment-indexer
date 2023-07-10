@@ -12,7 +12,25 @@ type SaveItemCommentBody = {
 }
 
 export default class CommentsController {
-  public async saveItemComment({ request, response }: HttpContextContract) {
+  public async saveItemComment({ auth, session, request, response }: HttpContextContract) {
+    const sessionAccountName = session.get('account_name')
+    // console.log('saveItemComment session', session)
+    // console.log('saveItemComment auth', auth)
+    const { poster: account_name } = request.body().data
+    console.log('saveItemComment account_name: ', account_name)
+    console.log('saveItemComment sessionAccountName', sessionAccountName)
+    // const viaRemember = auth.use('web').viaRemember
+    // console.log('viaRemember', viaRemember)
+    const authenticate = await auth.use('web').authenticate()
+    console.log('authenticate: ', authenticate)
+    console.log('auth.use(web).user!', auth.use('web').user!)
+    const isLoggedIn = auth.use('web').isLoggedIn
+    console.log('isLoggedIn', isLoggedIn)
+    if (!account_name || !sessionAccountName)
+      return response.status(401).json({ error: 'Not logged in' })
+    if (account_name !== sessionAccountName) {
+      return response.status(401).json({ error: 'Unauthorized' })
+    }
     console.log(request.body())
     const payload = request.body().data
     // const nonce = await Redis.get(`nonce:${account_name}`)
