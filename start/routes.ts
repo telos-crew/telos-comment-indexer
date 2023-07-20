@@ -28,6 +28,8 @@ Route.get('/comment/:content_hash', 'CommentsController.getCommentByHash')
 Route.get('/item/comments', 'CommentsController.getItemComments')
 Route.post('/item/comment', 'CommentsController.saveItemComment')
 
+Route.get('/replies/:comment_id', 'CommentsController.getReplies')
+
 Route.post('/upload', 'UploadsController.upload')
 Route.post('/upload/media', 'UploadsController.uploadMedia')
 

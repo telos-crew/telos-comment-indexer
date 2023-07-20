@@ -52,6 +52,8 @@ export default class CommentsController {
     const comment = await Database.from('comments')
       .where({ ...payload })
       .first()
+    const childCount = await this.getCommentChildCount(comment.id)
+    console.log('childCount: ', childCount)
     return response.json({ comment })
   }
 
@@ -73,6 +75,19 @@ export default class CommentsController {
     } catch (err) {
       return response.status(500).json({ error: err })
     }
+  }
+
+  public async getReplies({ request, response }: HttpContextContract) {
+    try {
+      const { comment_id } = request.params()
+      if (!comment_id) return response.status(400).json({ error: 'No comment id provided' })
+      const replies = await Database.from('comments')
+        .where({
+          parent_id: comment_id,
+        })
+        .orderBy('created_at', 'desc')
+      return response.json(replies)
+    } catch (err) {}
   }
 
   public async getCommentByHash({ request, response }: HttpContextContract) {
@@ -113,4 +128,9 @@ export default class CommentsController {
   public async update({}: HttpContextContract) {}
 
   public async destroy({}: HttpContextContract) {}
+
+  private async getCommentChildCount(id: number) {
+    const childCount = await Database.from('comments').count('parent_id', id)
+    return childCount
+  }
 }
