@@ -38,13 +38,21 @@ export default class CommentsController {
     // if (!nonce) return response.status(500).json({ error: 'Server error' })
     // const authServer = new AuthServer()
     console.log('saveItemComment about to verifyNonce')
-    await Database.table('comments').insert(payload)
+    await Database.table('comments').insert({
+      ...payload,
+      created_at: new Date(),
+      updated_at: new Date(),
+    })
     // const isValidNonce = await authServer.verifyNonce({
     //   account_name,
     //   serializedTransaction,
     //   signatures,
     //   nonce,
     // })
+    const comment = await Database.from('comments')
+      .where({ ...payload })
+      .first()
+    return response.json({ comment })
   }
 
   public async getItemComments({ request, response }: HttpContextContract) {
