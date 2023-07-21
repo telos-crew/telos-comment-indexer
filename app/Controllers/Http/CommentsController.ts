@@ -24,6 +24,9 @@ export default class CommentsController {
       created_at: new Date(),
       updated_at: new Date(),
     })
+    if (payload.parent_id) {
+      await Database.from('comments').where({ id: payload.parent_id }).increment('children', 1)
+    }
     // get comment
     const comment = await Database.from('comments')
       .where({ ...payload })
