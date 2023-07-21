@@ -1,7 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
-import Redis from '@ioc:Adonis/Addons/Redis'
-import { AuthServer } from '../../../util/auth'
 
 type SaveItemCommentBody = {
   contract: string
@@ -14,46 +12,22 @@ type SaveItemCommentBody = {
 export default class CommentsController {
   public async saveItemComment({ auth, session, request, response }: HttpContextContract) {
     const sessionAccountName = session.get('account_name')
-    // console.log('saveItemComment session', session)
-    // console.log('saveItemComment auth', auth)
     const { poster: account_name } = request.body().data
-    console.log('saveItemComment account_name: ', account_name)
-    console.log('saveItemComment sessionAccountName', sessionAccountName)
-    // const viaRemember = auth.use('web').viaRemember
-    // console.log('viaRemember', viaRemember)
-    const authenticate = await auth.use('web').authenticate()
-    console.log('authenticate: ', authenticate)
-    console.log('auth.use(web).user!', auth.use('web').user!)
-    const isLoggedIn = auth.use('web').isLoggedIn
-    console.log('isLoggedIn', isLoggedIn)
-    if (!account_name || !sessionAccountName)
-      return response.status(401).json({ error: 'Not logged in' })
-    if (account_name !== sessionAccountName) {
+    await auth.use('web').authenticate()
+    if (!account_name || !sessionAccountName || account_name !== sessionAccountName) {
       return response.status(401).json({ error: 'Unauthorized' })
     }
-    console.log(request.body())
     const payload = request.body().data
-    // const nonce = await Redis.get(`nonce:${account_name}`)
-    // console.log(nonce)
-    // if (!nonce) return response.status(500).json({ error: 'Server error' })
-    // const authServer = new AuthServer()
-    console.log('saveItemComment about to verifyNonce')
+    // insert comment
     await Database.table('comments').insert({
       ...payload,
       created_at: new Date(),
       updated_at: new Date(),
     })
-    // const isValidNonce = await authServer.verifyNonce({
-    //   account_name,
-    //   serializedTransaction,
-    //   signatures,
-    //   nonce,
-    // })
+    // get comment
     const comment = await Database.from('comments')
       .where({ ...payload })
       .first()
-    const childCount = await this.getCommentChildCount(comment.id)
-    console.log('childCount: ', childCount)
     return response.json({ comment })
   }
 
@@ -128,9 +102,4 @@ export default class CommentsController {
   public async update({}: HttpContextContract) {}
 
   public async destroy({}: HttpContextContract) {}
-
-  private async getCommentChildCount(id: number) {
-    const childCount = await Database.from('comments').count('parent_id', id)
-    return childCount
-  }
 }
