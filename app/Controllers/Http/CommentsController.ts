@@ -54,6 +54,33 @@ export default class CommentsController {
     }
   }
 
+  public async getTop2CommentLevels({ request, response }: HttpContextContract) {
+    try {
+      const { contract, scope, table, primary_key } = request.qs()
+      if (!contract || !scope || !table || !primary_key) {
+        return response.status(400).json({ error: 'Missing required params' })
+      }
+      const comments = await Database.from('comments').where({
+        contract,
+        scope,
+        table,
+        primary_key,
+        parent_id: null,
+      })
+      const commentIds = comments.map((comment) => comment.id)
+      const replies = await Database.from('comments').whereIn('parent_id', commentIds)
+      const nestedComments = comments.map((comment) => {
+        return {
+          ...comment,
+          replies: replies.filter((reply) => reply.parent_id === comment.id),
+        }
+      })
+      return response.json(nestedComments)
+    } catch (err) {
+      return response.status(500).json({ error: err })
+    }
+  }
+
   public async getReplies({ request, response }: HttpContextContract) {
     try {
       const { comment_id } = request.params()
