@@ -1,6 +1,6 @@
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
 import { replenishDstorAccessToken } from '../util'
-// import { query } from '../util/hyperion'
+import { query } from '../util/hyperion'
 
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
@@ -11,9 +11,9 @@ export default class AppProvider {
 
   public async boot() {
     // IoC container is ready
-    // const { default: Database } = await import('@ioc:Adonis/Lucid/Database')
-    // setInterval(() => query('testcomments', Database), 1000)
-    // replenishDstorAccessToken()
+    const { default: Database } = await import('@ioc:Adonis/Lucid/Database')
+    setInterval(() => query('testcomments', Database), 1000)
+    replenishDstorAccessToken()
   }
 
   public async ready() {
