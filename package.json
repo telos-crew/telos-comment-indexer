@@ -14,7 +14,9 @@
     "dockerAttach": "docker exec -it adonis_app /bin/sh",
     "dockerAttachRedis": "docker exec -it redis /bin/sh",
     "dockerAttachPostgres": "docker exec -it postgres /bin/sh",
-    "migrate:force": "ace migration:run --force"
+    "migrate:force": "ace migration:run --force",
+    "pm2": "pm2 start \"npm run dev\" --name comment --update-env",
+		"pm2-refresh": "pm2 start \"npm run refresh\" --name comment --update-env"
   },
   "eslintConfig": {
     "extends": [
